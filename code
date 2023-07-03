@@ -25,6 +25,8 @@ ggplot(CYCLE1, aes (NOMTIME, LIDV, group = ID,
   scale_y_continuous(limits=c (0.03,10))  #LIDV min-max
 
 
+
+
 #3rd: NOMTIME별 LIDV MEAN, SD table
   
 CYCLE1 |>
@@ -85,5 +87,13 @@ labs(color = 'ID', x = 'NOMTIME (hour)', y= 'LIDV (ng/ml)')
 scale_x_continuous(limits=c (0, 25)) #NOMTIME min-max
 scale_y_continuous(limits=c (0.03,10))  #LIDV min-max    
 
+
+# DOSE 별 Cmax의  mean, SD, min, max
+prac_tblNCA <- tblNCA(DOSE_10, key="ID", concUnit = "ng/l", colTime="NOMTIME", colConc="LIDV", dose = 10, 
+                      adm="Extravascular")
+
+desc_tblNCA <- function(tblNCA)
+  (psych::describe(tblNCA) |>
+    select(n, mean, sd, median, min, max))
 
 
