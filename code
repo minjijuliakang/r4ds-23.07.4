@@ -97,3 +97,13 @@ desc_tblNCA <- function(tblNCA)
     select(n, mean, sd, median, min, max))
 
 
+prac_tblNCA <- tblNCA(as.data.frame(CYCLE1), 
+               key = c("ID"),
+               colTime = "NOMTIME",
+               colConc = "LIDV",
+               dose = DOSE,
+               adm = "Extravascular",
+               concUnit = 'ug/mL',
+               R2ADJ = 0) 
+
+
