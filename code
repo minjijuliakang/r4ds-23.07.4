@@ -1,0 +1,89 @@
+
+library (tidyverse)
+library (ggplot2)
+library(readxl)
+library(NonCompart)
+library(dplyr)
+library(data.table)
+library(pkr)
+
+
+data<- read.csv ("pkpd_dataset.csv")
+
+#1st: filtering cycle 1 & CMT ==2
+CYCLE1 <-data |>
+  filter(CYCLE == 1 & CMT == 2 )
+  as.factor(ID)
+
+#2nd: LIDV dose with spaghetti plot
+
+ggplot(CYCLE1, aes (NOMTIME, LIDV, group = ID, 
+                    color = as.numeric (NOMTIME), color = as.factor (ID)))+
+  geom_line ()+
+  labs(color = 'ID', x = 'NOMTIME (hour)', y= 'LIDV (ng/ml)')
+  scale_x_continuous(limits=c (-50,2500)) #NOMTIME min-max
+  scale_y_continuous(limits=c (0.03,10))  #LIDV min-max
+
+
+#3rd: NOMTIME별 LIDV MEAN, SD table
+  
+CYCLE1 |>
+  group_by(NOMTIME) |>
+  summarize(LIDV_mean = mean(LIDV), sd(LIDV))
+
+# A tibble: 9 × 3
+#NOMTIME LIDV_mean `sd(LIDV)`
+#<dbl>     <dbl>      <dbl>
+#  1     0.1    0.279      0.469 
+#2     0.5    0.782      1.14  
+#3     1      0.906      1.27  
+#4     2      0.725      0.985 
+#5     4      0.412      0.592 
+#6     8      0.186      0.302 
+#7    12      0.119      0.155 
+#8    18      0.0871     0.0873
+#9    23.9    0.0791     0.0804
+
+
+#4th DOSE 별 시간-농도 곡선
+  #DOSE: 3, 10, 30, 100, 300 creating group by DOSE
+DOSE_3 <- CYCLE1 |>
+  filter (DOSE == 3)
+
+DOSE_10 <- CYCLE1 |>
+  filter (DOSE == 10)
+
+DOSE_30 <- CYCLE1 |>
+  filter (DOSE == 30)
+
+DOSE_100 <- CYCLE1 |>
+  filter (DOSE == 100)
+
+DOSE_300 <- CYCLE1 |>
+  filter (DOSE == 300)
+
+  #combining data frame into one
+by_DOSE <- rbind (DOSE_3, DOSE_10, DOSE_30, DOSE_100, DOSE_300)
+print(by_DOSE)
+
+
+  #concentration-time curve
+
+ggplot(CYCLE1, 
+       aes (NOMTIME, LIDV, group = ID, color = ID))+
+  geom_line ()+
+  geom_point ()+ facet_wrap(~DOSE) 
+  labs(color = 'ID', x = 'NOMTIME (hour)', y= 'LIDV (ng/ml)')
+scale_x_continuous(limits=c (0, 25)) #NOMTIME min-max
+scale_y_continuous(limits=c (0.03,10))  #LIDV min-max
+
+ggplot(DOSE_3, 
+       aes (NOMTIME, LIDV, group = ID,  color = ID, as.factor(ID)))+
+  geom_line ()+
+  geom_point ()+ facet_wrap(~DOSE) 
+labs(color = 'ID', x = 'NOMTIME (hour)', y= 'LIDV (ng/ml)')
+scale_x_continuous(limits=c (0, 25)) #NOMTIME min-max
+scale_y_continuous(limits=c (0.03,10))  #LIDV min-max    
+
+
+
